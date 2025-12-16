@@ -1,0 +1,27 @@
+- name: Configure L3 Port-Channel with members
+  hosts: leaf1
+  gather_facts: no
+  tasks:
+    - name: Create Port-Channel1 interface
+      arista.eos.eos_interfaces:
+        config:
+          - name: Port-Channel90
+            description: L3 PortChannel
+            enabled: true
+            mode: "layer3"
+        state: merged
+    - name: Configure L3 settings on Port-Channel90
+      arista.eos.eos_l3_interfaces:
+        config:
+          - name: Port-Channel90
+            ipv4:
+              - address: 10.10.20.12/24
+        state: merged
+    - name: Merge provided LAG attributes with existing device configuration
+      arista.eos.eos_lag_interfaces:
+        config:
+          - name: Port-Channel90
+            members:
+              - member: Ethernet1
+                mode: "on"
+        state: merged
